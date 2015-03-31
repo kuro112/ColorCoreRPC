@@ -21,8 +21,9 @@ class RPC_UI(QtGui.QWidget):
         self.setupRPC_UI(self)
 
     def setupRPC_UI(self, form):
-        global status
+        global status,stp
         status = "Stopped"
+        stp = 1
         form.setObjectName(_fromUtf8("form"))
         form.resize(252, 198)
         self.label = QtGui.QLabel(form)
@@ -47,12 +48,12 @@ class RPC_UI(QtGui.QWidget):
         self.label_4 = QtGui.QLabel(form)
         self.label_4.setGeometry(QtCore.QRect(10, 110, 61, 16))
         self.label_4.setObjectName(_fromUtf8("label_4"))
-        self.startbtn = QtGui.QPushButton(form)
-        self.startbtn.setGeometry(QtCore.QRect(10, 170, 75, 23))
-        self.startbtn.setObjectName(_fromUtf8("startbtn"))
-        self.stopbtn = QtGui.QPushButton(form)
-        self.stopbtn.setGeometry(QtCore.QRect(90, 170, 75, 23))
-        self.stopbtn.setObjectName(_fromUtf8("stopbtn"))
+        self.start_btn = QtGui.QPushButton(form)
+        self.start_btn.setGeometry(QtCore.QRect(10, 170, 75, 23))
+        self.start_btn.setObjectName(_fromUtf8("startbtn"))
+        self.stop_btn = QtGui.QPushButton(form)
+        self.stop_btn.setGeometry(QtCore.QRect(90, 170, 75, 23))
+        self.stop_btn.setObjectName(_fromUtf8("stopbtn"))
         self.label_5 = QtGui.QLabel(form)
         self.label_5.setGeometry(QtCore.QRect(110, 130, 71, 21))
         self.label_5.setObjectName(_fromUtf8("label_5"))
@@ -61,31 +62,53 @@ class RPC_UI(QtGui.QWidget):
         self.line.setFrameShape(QtGui.QFrame.HLine)
         self.line.setFrameShadow(QtGui.QFrame.Sunken)
         self.line.setObjectName(_fromUtf8("line"))
-        self.debugbtn = QtGui.QPushButton(form)
-        self.debugbtn.setGeometry(QtCore.QRect(170, 170, 75, 23))
-        self.debugbtn.setObjectName(_fromUtf8("debugbtn"))
-        self.startbtn.clicked.connect(self.colorStart)
-        self.stopbtn.clicked.connect(self.colorStop)
-        self.debugbtn.clicked.connect(self.showconsole)
+        self.debug_btn = QtGui.QPushButton(form)
+        self.debug_btn.setGeometry(QtCore.QRect(170, 170, 75, 23))
+        self.debug_btn.setObjectName(_fromUtf8("debugbtn"))
+        self.start_btn.clicked.connect(self.colorStart)
+        self.stop_btn.clicked.connect(self.colorStop)
+        self.debug_btn.clicked.connect(self.showConsole)
 
 
         self.rtUI(form)
         QtCore.QMetaObject.connectSlotsByName(form)
 
     def colorStart(form):
-        parseconfig(form)
-        global p
-        p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
-        global pid
-        pid = p.pid
-        form.label_5.setText(_translate("form", "Running", None))
+        global stp
+        if stp == 1:
+            parseConfig(form)
+            global p
+            p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
+            global pid
+            pid = p.pid
+            form.label_5.setText(_translate("form", "Running", None))
+            li = QtGui.QListWidgetItem()
+            li.setText("Starting RPC server on port %s..."%(lPort))
+            ex2.listWidget.addItem(li)
+            stp = 0
+        else:
+            print("Server Already Running on Port %s"%lPort)
+            li = QtGui.QListWidgetItem()
+            li.setText("Server Already Running on Port %s"%lPort)
+            ex2.listWidget.addItem(li)
 
     def colorStop(form):
-        form.label_5.setText(_translate("form", "Stopped", None))
-        p.terminate()
-        print("killed %s"%pid)
+        global stp
+        if stp != 1:
+            form.label_5.setText(_translate("form", "Stopped", None))
+            p.terminate()
+            li = QtGui.QListWidgetItem()
+            li.setText("killed Server Running on Port %s PID: %s"%(lPort,pid))
+            ex2.listWidget.addItem(li)
+            print("killed Server Running on Port %s PID: %s"%(lPort,pid))
+            stp = 1
+        else:
+            print("No Process to Stop")
+            li = QtGui.QListWidgetItem()
+            li.setText("No Process to Stop")
+            ex2.listWidget.addItem(li)
 
-    def showconsole(form):
+    def showConsole(form):
         ex2.show()
 
     def rtUI(self, form):
@@ -95,13 +118,13 @@ class RPC_UI(QtGui.QWidget):
         self.label_2.setText(_translate("form", "RPC User:", None))
         self.label_3.setText(_translate("form", "RPC Pass:", None))
         self.label_4.setText(_translate("form", "RPC Port:", None))
-        self.startbtn.setText(_translate("form", "Start", None))
-        self.stopbtn.setText(_translate("form", "Stop", None))
+        self.start_btn.setText(_translate("form", "Start", None))
+        self.stop_btn.setText(_translate("form", "Stop", None))
         self.label_5.setText(_translate("form", "Stopped", None))
-        self.debugbtn.setText(_translate("form", "Debug", None))
+        self.debug_btn.setText(_translate("form", "Debug", None))
 
 
-def parseconfig(form):
+def parseConfig(form):
     config = configparser.ConfigParser()
     url = "http://%s:%s@dev.opal-coin.com:%s"%(form.user.text(),form.passw.text(),form.port.text())
     config.read('config.ini')
@@ -109,6 +132,8 @@ def parseconfig(form):
     configfile = open('config.ini', 'w')
     config.write(configfile)
     configfile.close()
+    global lPort
+    lPort = config.get("rpc","port")
 
 class opForm(QtGui.QWidget):
     def __init__(self):
@@ -124,8 +149,6 @@ class opForm(QtGui.QWidget):
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.listWidget = QtGui.QListWidget(Form)
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
-        item = QtGui.QListWidgetItem()
-        self.listWidget.addItem(item)
         self.verticalLayout.addWidget(self.listWidget)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
@@ -136,8 +159,6 @@ class opForm(QtGui.QWidget):
         Form.setWindowTitle(_translate("Form", "Output", None))
         __sortingEnabled = self.listWidget.isSortingEnabled()
         self.listWidget.setSortingEnabled(False)
-        item = self.listWidget.item(0)
-        item.setText(_translate("Form", "Output", None))
         self.listWidget.setSortingEnabled(__sortingEnabled)
 
 if __name__ == '__main__':
