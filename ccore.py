@@ -66,7 +66,7 @@ class Ui_Form(QtGui.QWidget):
         self.debugbtn.setObjectName(_fromUtf8("debugbtn"))
         self.startbtn.clicked.connect(self.colorstart)
         self.stopbtn.clicked.connect(self.colorstop)
-        #self.debugbtn.clicked.connect(self.parseconfig)
+        self.debugbtn.clicked.connect(self.showconsole)
 
 
         self.retranslateUi(form)
@@ -74,8 +74,6 @@ class Ui_Form(QtGui.QWidget):
 
     def colorstart(form):
         parseconfig(form)
-        cmd = ""
-        #runz(cmd)
         global p
         p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
         global pid
@@ -87,6 +85,8 @@ class Ui_Form(QtGui.QWidget):
         p.terminate()
         print("killed %s"%pid)
 
+    def showconsole(form):
+        ex2.show()
 
     def retranslateUi(self, form):
         form.setWindowTitle(_translate("form", "CC RPC Server", None))
@@ -100,16 +100,6 @@ class Ui_Form(QtGui.QWidget):
         self.label_5.setText(_translate("form", "Stopped", None))
         self.debugbtn.setText(_translate("form", "Debug", None))
 
-#def runz(cmd):
-    #p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    #stdout = []
-    #while True:
-        #line = p.stdout.readline()
-        #stdout.append(line)
-        #print(line),
-        #if line == '' and p.poll() != None:
-            #break
-    #return ''.join(stdout)
 
 def parseconfig(form):
     config = configparser.ConfigParser()
@@ -120,9 +110,41 @@ def parseconfig(form):
     config.write(configfile)
     configfile.close()
 
+class opForm(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.setupOP(self)
+
+    def setupOP(self, Form):
+        Form.setObjectName(_fromUtf8("Form"))
+        Form.resize(280, 93)
+        self.gridLayout = QtGui.QGridLayout(Form)
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.listWidget = QtGui.QListWidget(Form)
+        self.listWidget.setObjectName(_fromUtf8("listWidget"))
+        item = QtGui.QListWidgetItem()
+        self.listWidget.addItem(item)
+        self.verticalLayout.addWidget(self.listWidget)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+
+        self.rtOPF(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def rtOPF(self, Form):
+        Form.setWindowTitle(_translate("Form", "Output", None))
+        __sortingEnabled = self.listWidget.isSortingEnabled()
+        self.listWidget.setSortingEnabled(False)
+        item = self.listWidget.item(0)
+        item.setText(_translate("Form", "Output", None))
+        self.listWidget.setSortingEnabled(__sortingEnabled)
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     global ex
     ex = Ui_Form()
     ex.show()
+    global ex2
+    ex2 = opForm()
     sys.exit(app.exec_())
