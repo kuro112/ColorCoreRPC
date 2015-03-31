@@ -1,6 +1,5 @@
 from PyQt4 import QtCore, QtGui
-import sys,subprocess,os,configparser,psutil
-
+import sys,subprocess,os,configparser,signal
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -75,22 +74,22 @@ class Ui_Form(QtGui.QWidget):
 
     def colorstart(form):
         parseconfig(form)
-        cmd = "['python', 'colorcore.py', 'server']"
+        cmd = ""
         #runz(cmd)
-        p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=True, stderr=subprocess.STDOUT)
+        global p
+        p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
         global pid
         pid = p.pid
         form.label_5.setText(_translate("form", "Running", None))
 
     def colorstop(form):
         form.label_5.setText(_translate("form", "Stopped", None))
-        p = psutil.Process(pid)
-        p.kill()
-        print("killed %s PID: %s"%(p,pid))
+        p.terminate()
+        print("killed %s"%pid)
 
 
     def retranslateUi(self, form):
-        form.setWindowTitle(_translate("form", "ColorCore", None))
+        form.setWindowTitle(_translate("form", "CC RPC Server", None))
         self.label.setText(_translate("form", "ColorCore", None))
         self.port.setText(_translate("form", "51990", None))
         self.label_2.setText(_translate("form", "RPC User:", None))
