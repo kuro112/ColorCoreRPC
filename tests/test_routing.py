@@ -71,17 +71,17 @@ class RouterTests(unittest.TestCase):
             spec=event_loop_mock.create_server, return_value=run_forever_mock_value)
 
         self.configuration.rpc_enabled = True
-        self.configuration.rpc_port = 8080
+        self.configuration.rpc_port = 8000
 
         router.parse(['server'])
 
-        self.assertIn('Starting RPC server on port 8080...\n', self.output.getvalue())
+        self.assertIn('Starting RPC server on port 8000...\n', self.output.getvalue())
         self.assertEqual(1, event_loop_mock.create_server.call_count)
 
     def test_parse_server_not_enabled(self):
         router, event_loop_mock = self.create_router()
         self.configuration.rpc_enabled = False
-        self.configuration.rpc_port = 8080
+        self.configuration.rpc_port = 8000
 
         router.parse(['server'])
 

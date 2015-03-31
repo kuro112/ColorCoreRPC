@@ -78,7 +78,7 @@ class RPC_UI(QtGui.QWidget):
         if stp == 1:
             parseConfig(form)
             global p
-            p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
+            p = subprocess.Popen(['python3', 'colorcore.py', 'server'], shell=False)
             global pid
             pid = p.pid
             form.label_5.setText(_translate("form", "Running", None))
@@ -128,7 +128,7 @@ def parseConfig(form):
     config = configparser.ConfigParser()
     url = "http://%s:%s@dev.opal-coin.com:%s"%(form.user.text(),form.passw.text(),form.port.text())
     config.read('config.ini')
-    config.set('opalcoind','rpcurl', url)
+    config.set('bitcoind','rpcurl', url)
     configfile = open('config.ini', 'w')
     config.write(configfile)
     configfile.close()
