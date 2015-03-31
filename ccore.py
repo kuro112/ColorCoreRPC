@@ -1,5 +1,5 @@
 from PyQt4 import QtCore, QtGui
-import sys,subprocess,os,configparser,signal
+import sys,subprocess,os,configparser
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -15,12 +15,12 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Form(QtGui.QWidget):
+class RPC_UI(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
-        self.setupUi(self)
+        self.setupRPC_UI(self)
 
-    def setupUi(self, form):
+    def setupRPC_UI(self, form):
         global status
         status = "Stopped"
         form.setObjectName(_fromUtf8("form"))
@@ -64,15 +64,15 @@ class Ui_Form(QtGui.QWidget):
         self.debugbtn = QtGui.QPushButton(form)
         self.debugbtn.setGeometry(QtCore.QRect(170, 170, 75, 23))
         self.debugbtn.setObjectName(_fromUtf8("debugbtn"))
-        self.startbtn.clicked.connect(self.colorstart)
-        self.stopbtn.clicked.connect(self.colorstop)
+        self.startbtn.clicked.connect(self.colorStart)
+        self.stopbtn.clicked.connect(self.colorStop)
         self.debugbtn.clicked.connect(self.showconsole)
 
 
-        self.retranslateUi(form)
+        self.rtUI(form)
         QtCore.QMetaObject.connectSlotsByName(form)
 
-    def colorstart(form):
+    def colorStart(form):
         parseconfig(form)
         global p
         p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
@@ -80,7 +80,7 @@ class Ui_Form(QtGui.QWidget):
         pid = p.pid
         form.label_5.setText(_translate("form", "Running", None))
 
-    def colorstop(form):
+    def colorStop(form):
         form.label_5.setText(_translate("form", "Stopped", None))
         p.terminate()
         print("killed %s"%pid)
@@ -88,7 +88,7 @@ class Ui_Form(QtGui.QWidget):
     def showconsole(form):
         ex2.show()
 
-    def retranslateUi(self, form):
+    def rtUI(self, form):
         form.setWindowTitle(_translate("form", "CC RPC Server", None))
         self.label.setText(_translate("form", "ColorCore", None))
         self.port.setText(_translate("form", "51990", None))
@@ -143,7 +143,7 @@ class opForm(QtGui.QWidget):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     global ex
-    ex = Ui_Form()
+    ex = RPC_UI()
     ex.show()
     global ex2
     ex2 = opForm()
