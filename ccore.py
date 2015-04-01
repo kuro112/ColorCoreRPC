@@ -78,7 +78,7 @@ class RPC_UI(QtGui.QWidget):
         if stp == 1:
             parseConfig(form)
             global p
-            p = subprocess.Popen(['python3', 'colorcore.py', 'server'], shell=False)
+            p = subprocess.Popen(['python', 'colorcore.py', 'server'], shell=False)
             global pid
             pid = p.pid
             form.label_5.setText(_translate("form", "Running", None))
