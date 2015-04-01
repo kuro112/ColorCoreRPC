@@ -126,7 +126,7 @@ class RPC_UI(QtGui.QWidget):
 
 def parseConfig(form):
     config = configparser.ConfigParser()
-    url = "http://%s:%s@dev.opal-coin.com:%s"%(form.user.text(),form.passw.text(),form.port.text())
+    url = "http://%s:%s@localhost:%s"%(form.user.text(),form.passw.text(),form.port.text())
     config.read('config.ini')
     config.set('bitcoind','rpcurl', url)
     configfile = open('config.ini', 'w')
